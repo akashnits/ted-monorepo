@@ -86,3 +86,18 @@ Outputs to skills:
 - Unsupported markets or asset types are rejected or marked unavailable
 - Gateway does not perform investment reasoning or recommendations
 
+## Implementation Notes
+
+- Put tool gateway code in `src/research/`
+- Expose a small initial tool set: `resolve_security`, `get_quote`, `get_company_profile`, `get_financials`, `get_filings`, `get_recent_news`, and `get_peer_snapshot`
+- Keep tool IDs stable because the Investment Research Skill and Hermes tool manifest will refer to them
+- Use Pydantic models for tool inputs and outputs
+- Every successful tool response should include source metadata and `retrieved_at`
+- Return structured unavailable or error results instead of raising provider-specific errors into Hermes
+- Start with provider adapters behind the gateway
+- Do not put provider API details in skill instructions
+- Prefer official company and filing sources for core claims
+- Use news for recent developments, sentiment, and context
+- Keep all tool access read-only
+- Do not expose raw provider secrets to Hermes
+- Unit tests should fake provider adapters and verify normalized outputs, source metadata, unsupported assets, and provider failure handling
