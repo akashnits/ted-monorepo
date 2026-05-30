@@ -6,6 +6,7 @@ This repository is documentation for a Telegram-based personal assistant. Treat 
 
 - `docs/personal-assistant-mvp-requirements-v2.md`
 - `docs/personal-assistant-mvp-technical-spec.md`
+- `docs/tasks/`
 
 ## Operating Rules
 
