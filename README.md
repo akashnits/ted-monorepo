@@ -8,6 +8,7 @@ The project is currently in specification/design stage. The Python package is a 
 
 - `docs/personal-assistant-mvp-technical-spec.md` - architecture and implementation direction
 - `docs/personal-assistant-mvp-requirements-v2.md` - product requirements and scope
+- `docs/implementation-approach.md` - recommended build order
 - `docs/tasks/` - component-level task specs
 
 ## Current Principles
@@ -27,4 +28,3 @@ The project is currently in specification/design stage. The Python package is a 
 - `src/personal_assistant_mvp/` - Python package skeleton
 - `tests/` - starter tests
 - `pyproject.toml` - Python project metadata
-
