@@ -10,7 +10,7 @@ The design follows one boundary:
 
 ## 2. Architecture
 
-![Architecture overview](/Users/akash/Documents/Codex/2026-05-30/understand-the-requirements-personal-assistant-mvp/assets/architecture-overview.svg)
+![Architecture overview](../assets/architecture-overview.svg)
 
 The product is split into three layers:
 
@@ -24,7 +24,7 @@ Hermes is the first agent runtime. The app calls it through a small internal age
 
 Research flow:
 
-![Investment research flow](/Users/akash/Documents/Codex/2026-05-30/understand-the-requirements-personal-assistant-mvp/assets/research-flow.svg)
+![Investment research flow](../assets/research-flow.svg)
 
 ## 3. Minimal Data Model
 
