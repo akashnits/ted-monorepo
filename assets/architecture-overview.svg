@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Personal Assistant MVP architecture overview">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 30px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 16px Arial, sans-serif; fill: #4b5563; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 14; }
+      .core { fill: #eef2ff; stroke: #6366f1; }
+      .agent { fill: #ecfdf5; stroke: #10b981; }
+      .data { fill: #fff7ed; stroke: #f97316; }
+      .label { font: 700 17px Arial, sans-serif; fill: #111827; }
+      .small { font: 400 13px Arial, sans-serif; fill: #475569; }
+      .arrow { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrowhead); }
+      .boundary { fill: none; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 8 8; rx: 18; }
+      .boundary-title { font: 700 15px Arial, sans-serif; fill: #334155; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 Z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1280" height="720" />
+  <text class="title" x="48" y="56">Personal Assistant MVP Architecture</text>
+  <text class="subtitle" x="48" y="84">The app owns product state. Hermes owns research reasoning. The skill owns investment-specific standards.</text>
+
+  <rect class="boundary" x="38" y="122" width="400" height="496" />
+  <text class="boundary-title" x="58" y="150">Product Application Layer</text>
+
+  <rect class="boundary" x="476" y="122" width="380" height="496" />
+  <text class="boundary-title" x="496" y="150">Agent / Skill Layer</text>
+
+  <rect class="boundary" x="894" y="122" width="338" height="496" />
+  <text class="boundary-title" x="914" y="150">Data and External Sources</text>
+
+  <rect class="box" x="70" y="196" width="220" height="78" />
+  <text class="label" x="92" y="226">Telegram User</text>
+  <text class="small" x="92" y="250">Natural language requests</text>
+
+  <rect class="box core" x="70" y="328" width="290" height="92" />
+  <text class="label" x="92" y="360">Telegram Bot App</text>
+  <text class="small" x="92" y="384">Commands, messages, replies</text>
+  <text class="small" x="92" y="404">No investment logic</text>
+
+  <rect class="box core" x="70" y="474" width="290" height="104" />
+  <text class="label" x="92" y="506">Request Orchestrator</text>
+  <text class="small" x="92" y="530">Loads context</text>
+  <text class="small" x="92" y="550">Handles confirmations</text>
+  <text class="small" x="92" y="570">Saves completed artifacts</text>
+
+  <rect class="box agent" x="522" y="214" width="284" height="88" />
+  <text class="label" x="544" y="246">Agent Runtime Interface</text>
+  <text class="small" x="544" y="270">Stable app-facing boundary</text>
+
+  <rect class="box agent" x="522" y="350" width="284" height="92" />
+  <text class="label" x="544" y="382">Hermes Agent Runtime</text>
+  <text class="small" x="544" y="406">Plans, researches, synthesizes</text>
+  <text class="small" x="544" y="426">Returns brief + artifact payload</text>
+
+  <rect class="box agent" x="522" y="498" width="284" height="88" />
+  <text class="label" x="544" y="530">Investment Research Skill</text>
+  <text class="small" x="544" y="554">Quality bar, safety, output rules</text>
+
+  <rect class="box data" x="934" y="190" width="252" height="108" />
+  <text class="label" x="956" y="222">Application Database</text>
+  <text class="small" x="956" y="246">Users, profiles, portfolios</text>
+  <text class="small" x="956" y="266">Sessions, artifacts, sources</text>
+
+  <rect class="box data" x="934" y="376" width="252" height="108" />
+  <text class="label" x="956" y="408">Research Tools</text>
+  <text class="small" x="956" y="432">Market data, filings, news</text>
+  <text class="small" x="956" y="452">Source metadata</text>
+
+  <path class="arrow" d="M180 274 L180 318" />
+  <path class="arrow" d="M215 420 L215 464" />
+  <path class="arrow" d="M360 526 L512 258" />
+  <path class="arrow" d="M806 258 L924 244" />
+  <path class="arrow" d="M806 396 L924 430" />
+  <path class="arrow" d="M664 302 L664 340" />
+  <path class="arrow" d="M664 442 L664 488" />
+  <path class="arrow" d="M522 542 L374 542" />
+  <path class="arrow" d="M934 244 L374 506" />
+
+  <text class="small" x="390" y="222">Normalized research request</text>
+  <text class="small" x="830" y="222">Load/save state</text>
+  <text class="small" x="832" y="410">Fetch evidence</text>
+  <text class="small" x="382" y="566">Validated brief</text>
+</svg>
