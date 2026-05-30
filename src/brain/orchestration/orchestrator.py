@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+from uuid import UUID
+
 from brain.chat.types import ChatAction, ChatMessage, ChatResponse
-from brain.execution.types import AgentExecutionRequest, ExecutionStatus
+from brain.context import ContextService, InMemoryContextService
 from brain.execution.fake import FakeAgentExecutor
+from brain.execution.types import AgentExecutionRequest, ExecutionStatus
 from brain.planning.fake import FakeTaskPlanner
 from brain.planning.types import PlanStatus
+from brain.session import InMemorySessionService, SessionService
+from brain.users import InMemoryUserService, UserService
 
 
 class RequestOrchestrator:
@@ -14,17 +19,24 @@ class RequestOrchestrator:
         self,
         planner: FakeTaskPlanner | None = None,
         executor: FakeAgentExecutor | None = None,
+        user_service: UserService | None = None,
+        context_service: ContextService | None = None,
+        session_service: SessionService | None = None,
     ) -> None:
         self._planner = planner or FakeTaskPlanner()
         self._executor = executor or FakeAgentExecutor()
+        self._users = user_service or InMemoryUserService()
+        self._context = context_service or InMemoryContextService()
+        self._sessions = session_service or InMemorySessionService()
 
     async def handle_message(self, message: ChatMessage) -> ChatResponse:
         text = message.text.strip()
         if not text:
             return ChatResponse(text="Send me a request to research.")
 
+        user = await self._users.resolve_user(message)
         if text.startswith("/"):
-            return self._handle_command(text)
+            return await self._handle_command(text, user.user_id)
 
         plan = await self._planner.plan(text)
         if plan.status == PlanStatus.UNSUPPORTED:
@@ -54,16 +66,23 @@ class RequestOrchestrator:
     async def handle_action(self, action: ChatAction) -> ChatResponse:
         return ChatResponse(text=f"Action `{action.action_id}` is not wired yet.")
 
-    def _handle_command(self, command_text: str) -> ChatResponse:
+    async def _handle_command(self, command_text: str, user_id: UUID) -> ChatResponse:
         command = command_text.split(maxsplit=1)[0]
         if command == "/start":
             return ChatResponse(text="Ted is ready. Send an investment research request.")
         if command == "/profile":
-            return ChatResponse(text="Profile support is not wired yet.")
+            profile = await self._context.get_profile(user_id)
+            return ChatResponse(text=profile.to_display_text())
         if command == "/portfolio":
-            return ChatResponse(text="Portfolio support is not wired yet.")
+            portfolio = await self._context.get_portfolio(user_id)
+            return ChatResponse(text=portfolio.to_display_text())
         if command == "/start_session":
-            return ChatResponse(text="Session support is not wired yet.")
+            session = await self._sessions.start_session(user_id)
+            expires_at = session.expires_at.strftime("%Y-%m-%d %H:%M UTC")
+            return ChatResponse(text=f"Session started. It expires at {expires_at}.")
         if command == "/end_session":
-            return ChatResponse(text="Session support is not wired yet.")
+            ended = await self._sessions.end_session(user_id)
+            if ended:
+                return ChatResponse(text="Session ended.")
+            return ChatResponse(text="No active session to end.")
         return ChatResponse(text=f"Unknown command: {command}")
