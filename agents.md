@@ -11,7 +11,7 @@ This repository is documentation for a Telegram-based personal assistant . Treat
 ## Operating Rules
 
 - Do not invent product behavior that conflicts with the requirements
-- Keep the MVP scope narrow and avoid broadening it without explicit instruction
+- Keep the scope narrow and avoid broadening it without explicit instruction
 - Preserve the explicit-memory model; do not infer durable preferences from conversation
 - Treat profile data as durable explicit context
 - Treat portfolio data as sensitive context that requires user confirmation before use
