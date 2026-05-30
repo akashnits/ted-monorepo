@@ -15,6 +15,13 @@ class Settings(BaseSettings):
 
     environment: str = Field(default="local")
     log_level: str = Field(default="INFO")
+    database_url: str = Field(
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/ted",
+        description="SQLAlchemy async database URL.",
+    )
+    telegram_bot_token: str | None = Field(default=None)
+    hermes_base_url: str | None = Field(default=None)
+    hermes_api_key: str | None = Field(default=None)
 
 
 @lru_cache
