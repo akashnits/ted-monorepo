@@ -132,3 +132,17 @@ Shopping request:
 - Planner output is structured enough for orchestrator validation
 - Planner output never serves as the final user-facing answer
 - Future personalization domains can be added without changing the Chat Gateway
+
+## Implementation Notes
+
+- Put planner code in `src/planning/`
+- Use an LLM for intent classification and planning
+- Keep planner tool access limited to approved Context Service read APIs
+- Start with one planner interface: `plan(user_request, user_id, session_summary, skill_cards) -> TaskPlan`
+- Use structured LLM output, preferably JSON validated with Pydantic
+- Planner input should include planner-safe skill cards from the Skill Registry, not executor skill config
+- Planner may call Context Service summary APIs to understand what context exists for the user
+- Planner must not query database tables directly
+- Planner output should say what context is useful, not what context is authorized
+- Keep statuses simple: `ready`, `needs_clarification`, `unsupported`, `needs_context_confirmation`
+- Unit tests should mock the LLM and Context Service to verify classification, skill selection, missing context handling, and unsupported request behavior
