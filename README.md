@@ -17,6 +17,9 @@ This repository captures the product and architecture documentation for a Telegr
 - `personal-assistant-mvp-technical-spec.md` - architecture and implementation direction
 - `assets/architecture-overview.svg` - architecture diagram
 - `assets/research-flow.svg` - research flow diagram
+- `src/personal_assistant_mvp/` - Python package skeleton
+- `tests/` - starter test suite
+- `pyproject.toml` - Python project metadata and build config
 
 ## Core Design Principles
 
@@ -33,3 +36,10 @@ This repo currently contains specifications and design assets rather than execut
 
 The next implementation steps are described in `personal-assistant-mvp-technical-spec.md`.
 
+## Project Layout
+
+The Python package follows a standard `src/` layout:
+
+- `src/personal_assistant_mvp/` for importable application code
+- `tests/` for automated checks
+- `pyproject.toml` for packaging, CLI entry points, and test configuration

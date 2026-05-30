@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "personal-assistant-mvp"
+version = "0.1.0"
+description = "Telegram-based personal assistant MVP documentation and starter package"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [
+  { name = "akashnits", email = "akash.nits@outlook.com" }
+]
+
+[project.scripts]
+personal-assistant-mvp = "personal_assistant_mvp.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
