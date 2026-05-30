@@ -14,6 +14,29 @@ Chat Gateway
 -> Hermes Runtime Adapter
 ```
 
+## Diagram
+
+```mermaid
+flowchart TD
+    Gateway[Chat Gateway] --> Orchestrator[Request Orchestrator]
+    Orchestrator --> User[User Service]
+    Orchestrator --> Session[Session Manager]
+    Orchestrator --> Context[Context Service]
+    Orchestrator --> Decision{Command or task?}
+    Decision -->|Command| Command[Handle Command]
+    Decision -->|Task| Planner[Task Planner]
+    Planner --> Policy[Apply Product Policy]
+    Policy --> Confirmation{Needs confirmation?}
+    Confirmation -->|Yes| Pending[Store Pending State]
+    Pending --> Gateway
+    Confirmation -->|No| Executor[Agent Executor]
+    Executor --> Validator[Output Validator]
+    Validator --> Artifact[Artifact Store]
+    Artifact --> Response[Build ChatResponse]
+    Command --> Response
+    Response --> Gateway
+```
+
 ## Design Principle
 
 Borrow the gateway/executor boundary from Doghouse, but keep this app simple.
@@ -105,4 +128,3 @@ On confirmation, the orchestrator resumes the stored task with portfolio context
 - Failed or invalid results are not saved as completed artifacts
 - Orchestrator code contains no investment research logic
 - Orchestrator code contains no Telegram-specific rendering logic
-

@@ -12,6 +12,19 @@ Telegram
 -> Request Orchestrator
 ```
 
+## Diagram
+
+```mermaid
+flowchart LR
+    Telegram[Telegram] --> Adapter[Telegram Adapter]
+    Adapter --> Normalize[Normalize Event]
+    Normalize --> Message[ChatMessage or ChatAction]
+    Message --> Orchestrator[Request Orchestrator]
+    Orchestrator --> Response[ChatResponse]
+    Response --> Render[Render for Telegram]
+    Render --> Telegram
+```
+
 ## Responsibilities
 
 - Receive Telegram updates
@@ -67,4 +80,3 @@ The Request Orchestrator is the only application component the gateway should ca
 - Gateway code contains no investment-specific reasoning
 - Gateway code does not call Hermes directly
 - Adding another chat platform does not require changing orchestrator input contracts
-
