@@ -38,7 +38,7 @@ Useful local commands:
 uv sync
 uv run pytest
 uv run ruff check .
-uv run python -m personal_assistant_mvp
+uv run python -m brain
 ```
 
 Core dependencies to add when implementation starts:

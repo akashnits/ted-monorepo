@@ -25,6 +25,6 @@ The project is currently in specification/design stage. The Python package is a 
 
 - `docs/` - product, architecture, and task specs
 - `assets/` - architecture diagrams
-- `src/personal_assistant_mvp/` - Python package skeleton
+- `src/brain/` - Python package skeleton
 - `tests/` - starter tests
 - `pyproject.toml` - Python project metadata

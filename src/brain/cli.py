@@ -9,8 +9,8 @@ from . import __version__
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="personal-assistant-mvp",
-        description="Starter CLI for the Personal Assistant MVP project.",
+        prog="ted",
+        description="Ted personal assistant.",
     )
     parser.add_argument(
         "--version",
@@ -27,4 +27,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
