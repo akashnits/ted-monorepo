@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This repository is documentation for a Telegram-based personal assistant MVP. Treat the specification files as the source of truth.
+This repository is documentation for a Telegram-based personal assistant . Treat the specification files as the source of truth.
 
 ## Read First
 
