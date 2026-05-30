@@ -108,3 +108,17 @@ This is not handled as session memory. It should go through explicit profile upd
 - Starting a new session clears previous temporary state
 - Session Manager does not infer or store long-term preferences
 
+## Implementation Notes
+
+- Put session code in `src/session/`
+- Store sessions in Postgres so restarts do not lose pending confirmation state
+- Keep the schema simple: `user_id`, `status`, `temporary_instructions`, `pending_state`, `last_activity_at`, `expires_at`, and timestamps
+- Store `pending_state` as typed JSON for now
+- Use `pending_state` for portfolio confirmation state and later other confirmation types
+- Use Pydantic models for session state and pending state payloads
+- Check session expiry lazily when loading the session; no background scheduler is needed at first
+- Starting a new session should close or replace the previous active session for that user
+- Ending a session should clear temporary instructions and pending confirmation state
+- Keep session writes explicit
+- Do not let planner or executor mutate session state directly
+- Unit tests should cover start, end, expiry, pending confirmation save/load/clear, and replacing an existing active session
