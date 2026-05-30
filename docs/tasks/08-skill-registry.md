@@ -95,3 +95,16 @@ context_hints: profile is useful; portfolio may be useful for personalized recom
 - Unknown skill IDs are rejected before execution
 - Adding future skills does not require changing Chat Gateway or Request Orchestrator contracts
 
+## Implementation Notes
+
+- Put skill registry code in `src/skills/registry.py`
+- Put skill definitions under `src/skills/catalog/` or `skills/`, depending on whether they should be packaged with the app or edited as plain files
+- Start with a static registry in code or YAML
+- Do not add a database-backed skill registry yet
+- Define two views of each skill: `SkillCard` for the planner and `SkillConfig` for the executor
+- `SkillCard` should be compact and LLM-friendly: ID, description, supported tasks, context hints, and unsupported cases
+- `SkillConfig` should include execution details: Hermes skill reference, instruction file path, allowed tool IDs, output contract, and runtime defaults
+- Keep `investment_research` as the only registered skill first
+- Use stable string skill IDs like `investment_research`, not display names
+- Validate at startup that every registered skill has required fields and referenced instruction files
+- Unit tests should verify skill lookup, unknown skill rejection, planner card generation, executor config generation, and startup validation
