@@ -108,3 +108,19 @@ Outputs:
 - Unsupported requests are refused or narrowed clearly
 - The skill does not contain trade execution behavior
 
+## Implementation Notes
+
+- Put the skill instructions in `skills/investment_research/SKILL.md` so they are editable as plain text
+- Register the skill in the Skill Registry with ID `investment_research`
+- Keep the skill broad at first: single stock analysis, comparisons, action recommendations, and capital deployment guidance
+- Write the skill as a research playbook, not a generic prompt
+- The playbook should tell Hermes what evidence to gather and how to judge quality
+- Require a minimum research checklist: security resolution, business overview, recent financials, valuation context, recent developments, risks, source quality, and recommendation
+- Require portfolio fit analysis only when portfolio context is provided
+- Require the skill to state evidence gaps clearly instead of fabricating confidence
+- Define allowed recommendation labels such as `buy`, `watch`, `avoid`, and `need_more_info`
+- Define confidence labels such as `low`, `medium`, and `high`, tied to evidence quality
+- Define an output contract that includes chat brief, key reasons, key risks, recommendation, confidence, sources, and artifact payload
+- Keep disclaimers short and consistent
+- Do not let the output become legal boilerplate
+- Unit tests should validate skill registration, output contract expectations, unsupported request handling, and portfolio-context behavior through mocked executor/runtime outputs
