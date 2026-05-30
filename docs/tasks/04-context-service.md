@@ -4,7 +4,7 @@
 
 The Context Service is the application boundary for user personalization data.
 
-It gives the Task Planner safe summaries for planning and gives the Request Orchestrator authorized context for execution. This keeps the LLM smart enough to discover useful context without allowing it to query database tables directly or bypass product policy.
+It gives the Task Planner safe summaries for planning and gives the Request Orchestrator authorized context for execution. This lets the LLM discover useful personalization without letting it query database tables directly or bypass product policy.
 
 ```text
 Task Planner
@@ -20,18 +20,28 @@ Request Orchestrator
 
 ```mermaid
 flowchart TD
-    Planner[Task Planner] --> PlanningAPI[Planning Context APIs]
-    Orchestrator[Request Orchestrator] --> ExecutionAPI[Execution Context APIs]
-    PlanningAPI --> ContextService[Context Service]
-    ExecutionAPI --> ContextService
+    Planner[Task Planner] --> SummaryRequest[Ask what context exists]
+    Orchestrator[Request Orchestrator] --> ExecutionRequest[Ask for authorized context]
+    SummaryRequest --> ContextService[Context Service]
+    ExecutionRequest --> ContextService
     ContextService --> Profile[(Profile Data)]
     ContextService --> Portfolio[(Portfolio Data)]
     ContextService --> FuturePrefs[(Future Preference Data)]
-    ContextService --> PlanningSummary[Safe Context Summary]
-    ContextService --> AuthorizedContext[Authorized Execution Context]
-    PlanningSummary --> Planner
-    AuthorizedContext --> Orchestrator
+    ContextService --> Summary[Safe Summary]
+    ContextService --> Authorized[Authorized Context]
+    Summary --> Planner
+    Authorized --> Orchestrator
 ```
+
+## Flow
+
+The Context Service has two simple jobs.
+
+First, it helps the planner understand what context may be useful. For example, it can say that a profile exists, a portfolio exists, or shopping preferences exist. These are safe summaries used for planning.
+
+Second, it gives the orchestrator the actual context that is allowed to go into execution. For example, profile fields can be included automatically, but portfolio holdings are only returned after the user confirms using portfolio context for that task.
+
+This keeps personalization useful while keeping sensitive context behind product rules.
 
 ## Responsibilities
 
@@ -124,4 +134,3 @@ Examples:
 - Future personalization domains can be added without changing planner database access
 - Context Service does not write inferred preferences into durable memory
 - Storage details remain hidden from planner, executor, skills, and chat adapters
-

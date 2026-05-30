@@ -4,7 +4,7 @@
 
 The Task Planner uses an LLM to classify user intent, select the right skill, and discover which personalization context may help the task.
 
-It returns a structured plan to the Request Orchestrator. It must not execute the task, produce final user-facing research, write durable memory, or query the database directly.
+It returns a structured plan to the Request Orchestrator. It does not execute the task or produce the final answer.
 
 ```text
 Request Orchestrator
@@ -20,17 +20,24 @@ flowchart TD
     Orchestrator[Request Orchestrator] --> Planner[Task Planner]
     Planner --> LLM[LLM Intent Classifier]
     Planner --> Skills[Skill Registry]
-    Planner --> ContextAPI[Read-only Context APIs]
-    ContextAPI --> Profile[Profile Summary]
-    ContextAPI --> Portfolio[Portfolio Availability]
-    ContextAPI --> FutureContext[Future Personalization Context]
+    Planner --> Context[Ask Context Service]
+    Context --> Summary[Safe Context Summary]
     LLM --> Plan[Structured Task Plan]
     Skills --> Plan
-    Profile --> Plan
-    Portfolio --> Plan
-    FutureContext --> Plan
+    Summary --> Plan
     Plan --> Orchestrator
 ```
+
+## Flow
+
+The planner answers four questions:
+
+1. What is the user trying to do?
+2. Which skill should handle it?
+3. What personal context might make the answer better?
+4. Is anything missing before the task can continue?
+
+When the planner needs context, it asks the Context Service for safe summaries. It does not read database tables directly. The planner may recommend using some context, but the Request Orchestrator decides what is actually allowed for execution.
 
 ## Responsibilities
 
@@ -70,7 +77,7 @@ The planner may call approved read-only context APIs, such as:
 - `get_user_profile_summary`
 - `get_portfolio_availability`
 - `get_portfolio_confirmation_summary`
-- future preference or domain-context summary APIs
+- future domain summaries for shopping, travel, reminders, or other personal tasks
 
 The planner returns a structured task plan with:
 
@@ -111,7 +118,7 @@ Shopping request:
 
 - user asks for a product recommendation
 - planner selects a future `shopping_research` skill
-- planner checks profile, budget, location, and shopping preference summaries when available
+- planner checks safe summaries for budget, location, and shopping preferences when available
 - planner asks for clarification if required context is missing
 
 ## Acceptance Criteria
@@ -125,4 +132,3 @@ Shopping request:
 - Planner output is structured enough for orchestrator validation
 - Planner output never serves as the final user-facing answer
 - Future personalization domains can be added without changing the Chat Gateway
-
