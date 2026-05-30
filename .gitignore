@@ -9,4 +9,4 @@ dist/
 .coverage
 coverage.xml
 htmlcov/
-
+.DS_Store

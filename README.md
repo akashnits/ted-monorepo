@@ -1,7 +1,6 @@
 # Personal Assistant - Ted
 
-This repository captures the product and architecture documentation for a Telegram-based personal assistant
-
+This repository captures the product and architecture documentation for a Telegram-based personal assistant.
 
 - Telegram is the only user interface
 - The assistant supports one explicit profile per user
@@ -12,9 +11,8 @@ This repository captures the product and architecture documentation for a Telegr
 
 ## What Is In This Repo
 
-- `personal-assistant-mvp-requirements-v2.md` - product requirements and scope
-- `personal-assistant-mvp-srs.md` - software requirements specification
-- `personal-assistant-mvp-technical-spec.md` - architecture and implementation direction
+- `docs/personal-assistant-mvp-requirements-v2.md` - product requirements and scope
+- `docs/personal-assistant-mvp-technical-spec.md` - architecture and implementation direction
 - `assets/architecture-overview.svg` - architecture diagram
 - `assets/research-flow.svg` - research flow diagram
 - `src/personal_assistant_mvp/` - Python package skeleton
@@ -34,7 +32,7 @@ This repository captures the product and architecture documentation for a Telegr
 
 This repo currently contains specifications and design assets rather than executable application code.
 
-The next implementation steps are described in `personal-assistant-mvp-technical-spec.md`.
+The technical source of truth for implementation is `docs/personal-assistant-mvp-technical-spec.md`.
 
 ## Project Layout
 
@@ -43,3 +41,4 @@ The Python package follows a standard `src/` layout:
 - `src/personal_assistant_mvp/` for importable application code
 - `tests/` for automated checks
 - `pyproject.toml` for packaging, CLI entry points, and test configuration
+- `docs/` for product and architecture documentation

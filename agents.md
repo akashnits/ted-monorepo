@@ -1,12 +1,11 @@
 # Agent Instructions
 
-This repository is documentation for a Telegram-based personal assistant . Treat the specification files as the source of truth.
+This repository is documentation for a Telegram-based personal assistant. Treat the specification files as the source of truth.
 
 ## Read First
 
-- `personal-assistant-mvp-requirements-v2.md`
-- `personal-assistant-mvp-srs.md`
-- `personal-assistant-mvp-technical-spec.md`
+- `docs/personal-assistant-mvp-requirements-v2.md`
+- `docs/personal-assistant-mvp-technical-spec.md`
 
 ## Operating Rules
 
@@ -17,6 +16,7 @@ This repository is documentation for a Telegram-based personal assistant . Treat
 - Treat portfolio data as sensitive context that requires user confirmation before use
 - Keep the application layer thin and avoid hardcoding investment logic outside the skill layer
 - Prefer repository language and terminology from the specs when writing new docs or implementation notes
+- Treat `docs/personal-assistant-mvp-technical-spec.md` as the implementation source of truth
 
 ## Repo Conventions
 
@@ -29,4 +29,3 @@ This repository is documentation for a Telegram-based personal assistant . Treat
 
 - Architecture overview: `assets/architecture-overview.svg`
 - Research flow: `assets/research-flow.svg`
-
