@@ -7,6 +7,8 @@ import asyncio
 
 from . import __version__
 from brain.chat.types import ChatMessage, ChatResponse
+from brain.chat.telegram.app import run_polling
+from brain.config import get_settings
 from brain.orchestration import RequestOrchestrator
 
 
@@ -23,6 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
     ask_parser = subparsers.add_parser("ask", help="Run a request through the local skeleton.")
     ask_parser.add_argument("text", help="Request text.")
+    subparsers.add_parser("telegram", help="Run the Telegram polling gateway.")
     return parser
 
 
@@ -31,6 +34,8 @@ def main() -> int:
     if args.command == "ask":
         response = asyncio.run(_ask(args.text))
         print(response.text)
+    elif args.command == "telegram":
+        run_polling(get_settings())
     return 0
 
 
