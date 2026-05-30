@@ -1,8 +1,7 @@
-# Personal Assistant MVP
+# Personal Assistant - Ted
 
-This repository captures the product and architecture documentation for a Telegram-based personal assistant MVP focused on investment research.
+This repository captures the product and architecture documentation for a Telegram-based personal assistant
 
-The MVP is intentionally narrow:
 
 - Telegram is the only user interface
 - The assistant supports one explicit profile per user
