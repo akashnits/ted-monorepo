@@ -128,3 +128,16 @@ On confirmation, the orchestrator resumes the stored task with portfolio context
 - Failed or invalid results are not saved as completed artifacts
 - Orchestrator code contains no investment research logic
 - Orchestrator code contains no Telegram-specific rendering logic
+
+## Implementation Notes
+
+- Put orchestrator code in `src/orchestration/`
+- Keep the public interface small: `handle_message(...)` and `handle_action(...)`
+- The orchestrator should depend on interfaces for planner, context, session, executor, validator, and artifact store
+- Command handling lives here, not in the Chat Gateway
+- Natural language messages should go to the Task Planner before execution
+- The orchestrator should build execution requests only after required user decisions are complete
+- Keep portfolio confirmation as orchestrator-owned workflow state
+- Return `ChatResponse` objects to the gateway; do not return raw planner or executor objects
+- Use simple in-process dependencies first
+- Unit tests should use fake dependencies to verify routing, confirmation, execution handoff, validation, and persistence behavior
