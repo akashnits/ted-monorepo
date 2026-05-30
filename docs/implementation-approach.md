@@ -16,6 +16,38 @@ Telegram message
 
 Use fake planner/executor implementations first, then replace them with real components one by one.
 
+## Prerequisites
+
+- Use Python 3.12.
+- Use `uv` for dependency management, virtualenv creation, and lockfile handling.
+- Use Postgres as the application database.
+- Use SQLAlchemy 2.x and Alembic for database access and migrations.
+- Use Pydantic for application models and Pydantic Settings for config.
+- Use `python-telegram-bot` as the Telegram chat framework.
+- Use `httpx` for outbound HTTP calls.
+- Use `pytest`, `pytest-asyncio`, and `ruff` for tests and linting.
+- Do not add a general web framework at first.
+- Run the app as a Telegram polling process during local development.
+- Add FastAPI later only if deployment, Telegram webhooks, health checks, or HTTP tool endpoints require it.
+- Keep Research Tool Gateway as an internal Python boundary first.
+- Add HTTP tool proxy endpoints only if Hermes requires tools over HTTP/RPC.
+
+Useful local commands:
+
+```bash
+uv sync
+uv run pytest
+uv run ruff check .
+uv run python -m personal_assistant_mvp
+```
+
+Core dependencies to add when implementation starts:
+
+```bash
+uv add python-telegram-bot pydantic pydantic-settings sqlalchemy asyncpg alembic httpx
+uv add --dev pytest pytest-asyncio ruff
+```
+
 ## Build Order
 
 ### 1. Foundation
@@ -168,4 +200,3 @@ User: Should I buy TCS?
 - Keep investment logic inside the skill.
 - Use fake implementations to prove flow before adding external dependencies.
 - Tighten quality through skill instructions, tool descriptions, validator rules, and reviewed outputs.
-
