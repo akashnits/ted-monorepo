@@ -80,3 +80,17 @@ The Request Orchestrator is the only application component the gateway should ca
 - Gateway code contains no investment-specific reasoning
 - Gateway code does not call Hermes directly
 - Adding another chat platform does not require changing orchestrator input contracts
+
+## Implementation Notes
+
+- Use `python-telegram-bot`
+- Put Telegram-specific code in `src/chat/telegram/`
+- Put shared chat contracts in `src/chat/types.py`
+- Gateway flow: Telegram update -> `ChatMessage` or `ChatAction` -> orchestrator -> `ChatResponse` -> Telegram reply
+- Use polling for local development
+- Add webhooks later only if deployment needs them
+- Use inline keyboards for confirmations
+- Keep the gateway dumb: no planning, context decisions, Hermes calls, or database access
+- Start with plain text responses; add Markdown only after escaping is handled cleanly
+- Put long-message splitting in this layer because Telegram has platform-specific limits
+- Unit tests should mock Telegram updates and verify normalization and rendering without calling Telegram APIs
