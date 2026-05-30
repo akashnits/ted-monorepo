@@ -134,3 +134,18 @@ Examples:
 - Future personalization domains can be added without changing planner database access
 - Context Service does not write inferred preferences into durable memory
 - Storage details remain hidden from planner, executor, skills, and chat adapters
+
+## Implementation Notes
+
+- Put context code in `src/context/`
+- Use Postgres as the source of truth for profile, portfolio, and future explicit personalization data
+- Start with repository-style access behind the service
+- Do not allow direct database access from planner, orchestrator, executor, or skills
+- Expose two categories of methods: planning summaries and execution context
+- Planning summary methods should return safe compact objects like `ProfileSummary`, `PortfolioAvailability`, and `PortfolioConfirmationSummary`
+- Execution context methods can return fuller typed objects, but only when the orchestrator passes the required authorization or confirmation state
+- Use Pydantic models for context return types so planner inputs and executor context are structured and easy to validate
+- Keep context APIs read-only for now
+- Handle profile updates later as a separate explicit update flow
+- Do not add vector memory or semantic memory yet; keep personalization structured and explicit
+- Unit tests should verify that planner APIs never expose full sensitive context and execution APIs require authorization for portfolio data
