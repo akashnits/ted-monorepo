@@ -86,3 +86,17 @@ Output to the Request Orchestrator:
 - Executor does not contain user confirmation logic
 - Executor can be split into a worker or service later without changing orchestrator behavior
 
+## Implementation Notes
+
+- Put executor code in `src/execution/`
+- Keep the first executor in-process as a normal Python class
+- Do not add a worker, queue, or separate service yet
+- Use one public method like `execute(request: AgentExecutionRequest) -> AgentExecutionResult`
+- Define execution request and result models with Pydantic
+- Resolve executable skill config from the Skill Registry before calling the Hermes Runtime Adapter
+- Pass only the authorized context received from the orchestrator
+- Do not fetch extra context inside the executor
+- Call only the Hermes Runtime Adapter, not Hermes directly
+- Add lightweight execution metadata such as run ID, start/end timestamps, selected skill, and runtime name
+- Normalize runtime failures into structured execution failures instead of raising raw provider errors up the stack
+- Unit tests should fake the Skill Registry and Hermes Runtime Adapter to verify payload assembly, success handling, and failure handling
