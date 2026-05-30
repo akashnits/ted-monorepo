@@ -2,16 +2,10 @@
 
 ## Purpose
 
-The Request Orchestrator coordinates product workflow after the Chat Gateway normalizes user input.
-
-It owns command handling, user/session state flow, confirmation flow, planner handoff, executor handoff, validation handoff, artifact persistence, and chat-ready responses. It should remain deterministic product code and should not contain investment research logic.
+Coordinates product workflow after the Chat Gateway normalizes input. It handles commands, session/pending state, planner handoff, executor handoff, validation handoff, artifact persistence, and chat-ready responses.
 
 ```text
-Chat Gateway
--> Request Orchestrator
--> Task Planner
--> Agent Executor
--> Hermes Runtime Adapter
+Chat Gateway -> Request Orchestrator -> Task Planner -> Agent Executor
 ```
 
 ## Diagram
@@ -26,118 +20,82 @@ flowchart TD
     Decision -->|Command| Command[Handle Command]
     Decision -->|Task| Planner[Task Planner]
     Planner --> Policy[Apply Product Policy]
-    Policy --> Confirmation{Needs confirmation?}
-    Confirmation -->|Yes| Pending[Store Pending State]
-    Pending --> Gateway
-    Confirmation -->|No| Executor[Agent Executor]
+    Policy --> Confirm{Needs confirmation?}
+    Confirm -->|Yes| Pending[Store Pending State]
+    Confirm -->|No| Executor[Agent Executor]
     Executor --> Validator[Output Validator]
     Validator --> Artifact[Artifact Store]
-    Artifact --> Response[Build ChatResponse]
+    Pending --> Response[Build ChatResponse]
+    Artifact --> Response
     Command --> Response
     Response --> Gateway
 ```
 
-## Design Principle
+## Owns
 
-Borrow the gateway/executor boundary from Doghouse, but keep this app simple.
+- User resolution and command routing
+- Session and pending-confirmation workflow
+- Product policy enforcement before execution
+- Planner, executor, validator, and artifact-store handoffs
+- Returning `ChatResponse` objects to the gateway
 
-The first implementation should run in one Python service. The executor can be a local Python class. Do not add distributed queues, global concurrency controls, multi-tenant routing, S3 execution indexes, or separate worker infrastructure until the app actually needs them.
+## Does Not Own
 
-## Responsibilities
-
-- Receive normalized chat messages and chat actions
-- Resolve or create the internal user
-- Route general commands
-- Load and update session state
-- Detect and handle pending confirmations
-- Call the Task Planner for natural language requests
-- Enforce product policy before execution
-- Ask for missing user decisions when needed
-- Call the Agent Executor when a task is ready
-- Send completed executor output through validation
-- Save completed research artifacts after validation
-- Return chat-ready responses to the Chat Gateway
-
-## Non-Responsibilities
-
-- Telegram-specific rendering
-- Task interpretation
-- Skill selection
-- Investment research logic
-- Direct Hermes calls
+- Telegram rendering
+- Task interpretation or skill selection
+- Investment reasoning or direct Hermes calls
 - Research tool calls
-- Inferred durable memory
-- Queueing infrastructure
-- Multi-user concurrency control
-- Scheduled automation
+- Durable memory inference
+- Queueing, multi-user concurrency control, or scheduled automation
 
 ## Interfaces
 
-The Chat Gateway calls:
+- Gateway calls `handle_message(chat_message) -> chat_response`
+- Gateway calls `handle_action(chat_action) -> chat_response`
+- Orchestrator depends on `UserService`, `ContextService`, `SessionManager`, `TaskPlanner`, `AgentExecutor`, `OutputValidator`, and `ArtifactStore`
+- Orchestrator returns chat-ready responses only; raw planner/executor/validator objects stay internal
 
-- `handle_message(chat_message) -> chat_response`
-- `handle_action(chat_action) -> chat_response`
+## Policies
 
-The orchestrator depends on these component boundaries:
-
-- `UserService` for user identity
-- `ContextService` for explicit profile and portfolio context
-- `SessionManager` for temporary session and pending-state data
-- `TaskPlanner` for task interpretation and skill selection
-- `AgentExecutor` for running ready tasks
-- `OutputValidator` for result validation
-- `ArtifactStore` for completed research persistence
-
-The orchestrator returns only chat-ready responses. It should not return raw planner, executor, or validator objects to the Chat Gateway.
-
-## Key Policies
-
-- Commands are handled by the orchestrator without planner or executor calls
+- Commands do not call planner or executor
 - Natural language requests go through the Task Planner
-- The planner recommends task type, skill, missing context, and portfolio usefulness
-- The orchestrator enforces product policy before execution
-- Profile context may be included automatically when it exists because it is explicit durable context
-- Portfolio context must never be included without task-specific user confirmation
-- Planner output must not be treated as final research
-- Executor output must be validated before it is saved as a completed artifact
-- Failed or invalid executor output must not create a completed artifact
-- The first implementation should not require a distributed queue or separate worker service
+- Planner recommends task type, skill, missing context, and context usefulness
+- Orchestrator decides what context is allowed into execution
+- Profile context may be included automatically because it is explicit durable context
+- Portfolio context requires task-specific user confirmation
+- Planner output is never final research
+- Executor output must be validated before artifact persistence
+- Invalid or failed outputs must not create completed artifacts
+- First implementation stays in one Python service; no distributed queue or worker service
 
-## Pending Confirmation Policy
+## Pending Confirmation
 
-When portfolio context may be useful, the orchestrator should store pending task state and return a confirmation response with actions equivalent to:
+When portfolio context may be useful, store pending task state and return actions for:
 
 - use portfolio
 - continue without portfolio
 - cancel
 
-On confirmation, the orchestrator resumes the stored task with portfolio context. On skip, it resumes without portfolio context. On cancel, it clears pending state and does not execute the task.
+Confirm resumes with portfolio context. Skip resumes without it. Cancel clears pending state without execution.
 
 ## Acceptance Criteria
 
-- Chat Gateway uses one orchestrator interface for messages
-- Chat Gateway uses one orchestrator interface for actions
-- Commands are handled deterministically without planner or executor calls
-- Natural language requests are delegated to the Task Planner
-- Skill selection is not implemented inside the orchestrator
-- Agent execution is delegated to the Agent Executor
-- Profile context can be included automatically when available
-- Portfolio context is never included without task-specific confirmation
+- Gateway uses one orchestrator interface for messages and actions
+- Commands are deterministic and bypass planner/executor
+- Natural language requests delegate skill selection to the planner
+- Ready tasks delegate execution to the executor
+- Portfolio context is never included without confirmation
 - Pending confirmation state can be resumed or cancelled
 - Completed results are validated before persistence
-- Failed or invalid results are not saved as completed artifacts
-- Orchestrator code contains no investment research logic
-- Orchestrator code contains no Telegram-specific rendering logic
+- Orchestrator contains no investment or Telegram rendering logic
 
 ## Implementation Notes
 
 - Put orchestrator code in `src/orchestration/`
-- Keep the public interface small: `handle_message(...)` and `handle_action(...)`
-- The orchestrator should depend on interfaces for planner, context, session, executor, validator, and artifact store
-- Command handling lives here, not in the Chat Gateway
-- Natural language messages should go to the Task Planner before execution
-- The orchestrator should build execution requests only after required user decisions are complete
+- Keep public methods to `handle_message(...)` and `handle_action(...)`
+- Depend on interfaces for planner, context, session, executor, validator, and artifact store
+- Build execution requests only after required user decisions are complete
 - Keep portfolio confirmation as orchestrator-owned workflow state
-- Return `ChatResponse` objects to the gateway; do not return raw planner or executor objects
 - Use simple in-process dependencies first
-- Unit tests should use fake dependencies to verify routing, confirmation, execution handoff, validation, and persistence behavior
+- Unit tests should use fake dependencies for routing, confirmation, execution handoff, validation, and persistence behavior
+

@@ -2,15 +2,10 @@
 
 ## Purpose
 
-The Investment Research Skill owns investment-specific research behavior.
-
-It defines supported tasks, research standards, source expectations, output structure, and safety boundaries. Investment logic should live here, not in the Chat Gateway, Request Orchestrator, Task Planner, or Context Service.
+Owns investment-specific research behavior: supported tasks, research standards, source expectations, output structure, and safety boundaries. Investment logic belongs here, not in app workflow layers.
 
 ```text
-Skill Registry
--> Investment Research Skill
--> Hermes Runtime
--> Research Tool Gateway
+Skill Registry -> Investment Research Skill -> Hermes Runtime -> Research Tool Gateway
 ```
 
 ## Diagram
@@ -26,101 +21,82 @@ flowchart TD
     Skill --> Output[Research Brief and Artifact Payload]
 ```
 
-## Responsibilities
+## Owns
 
-- Define supported investment task types
-- Define unsupported asset classes and requests
-- Define research process expectations
-- Define source quality expectations
-- Define output structure
-- Define recommendation and confidence standards
-- Define safety boundaries and disclaimers
-- Define how profile context should be used when provided
-- Define how portfolio context should be used when provided
+- Supported and unsupported investment task types
+- Research process and source-quality expectations
+- Output structure
+- Recommendation and confidence standards
+- Safety boundaries and disclaimers
+- Use of provided profile and portfolio context
 
-## Non-Responsibilities
+## Does Not Own
 
 - Chat handling
-- Task planning
-- Skill selection
-- Portfolio confirmation
-- Context authorization
+- Task planning or skill selection
+- Portfolio confirmation or context authorization
 - Tool implementation
 - Artifact persistence
 - User profile updates
 - Trade execution
 
-## Supported Task Types
+## Scope
 
-- Single equity analysis
-- Buy, avoid, or watch recommendation
-- Comparison of two or more equities
-- Portfolio-aware analysis when portfolio context is provided
-- Capital deployment guidance within supported markets
+Supported:
 
-## Unsupported Task Types
+- single equity analysis
+- buy, avoid, watch, or need-more-info recommendation
+- comparison of multiple equities
+- portfolio-aware analysis when portfolio context is provided
+- capital deployment guidance within supported markets
 
-- Trade execution
-- Tax advice
-- Options, futures, crypto, bonds, mutual funds, or complex ETFs
-- Fully autonomous investing
-- Guaranteed-return claims
-- Research conclusions without enough source evidence
+Unsupported:
+
+- trade execution
+- tax advice
+- options, futures, crypto, bonds, mutual funds, or complex ETFs
+- fully autonomous investing
+- guaranteed-return claims
+- conclusions without enough source evidence
 
 ## Interfaces
 
-Inputs:
+Inputs: user request, profile context, portfolio context, task constraints, and available research tools.
 
-- user request
-- profile context when provided
-- portfolio context when provided
-- task constraints
-- available research tools
+Outputs: concise research brief, artifact payload, sources, recommendation, confidence, and diagnostics when research quality is limited.
 
-Outputs:
+## Policies
 
-- concise research brief
-- structured artifact payload
-- source references
-- recommendation or suggested action when appropriate
-- confidence level
-- diagnostics when research quality is limited
-
-## Key Policies
-
-- The skill may use only the context it receives
-- The skill must not assume portfolio context when it is absent
-- The skill must not request unauthorized context directly
-- If portfolio context is absent, portfolio-aware analysis must not be implied
-- If source quality is insufficient, the output should say so clearly
-- The skill should prioritize useful, evidence-backed research over speed
-- The skill should support India and US listed equities first
-- The skill should produce compact answers suitable for chat while still producing structured artifacts
+- Use only the context received
+- Do not assume portfolio context when absent
+- Do not request unauthorized context directly
+- Do not imply portfolio-aware analysis without portfolio context
+- State evidence gaps clearly instead of fabricating confidence
+- Prioritize useful, evidence-backed research over speed
+- Support India and US listed equities first
+- Produce compact chat answers plus structured artifacts
 
 ## Acceptance Criteria
 
 - Investment domain rules live in the skill layer
-- The skill supports India and US listed equities
-- The skill produces concise evidence-backed briefs
-- The skill produces structured artifact payloads
-- The skill uses profile context when provided
-- The skill uses portfolio context only when provided
+- India and US listed equities are supported
+- Output includes concise evidence-backed briefs and structured artifact payloads
+- Profile context is used when provided
+- Portfolio context is used only when provided
 - Unsupported requests are refused or narrowed clearly
-- The skill does not contain trade execution behavior
+- No trade execution behavior exists
 
 ## Implementation Notes
 
-- Put the skill instructions in `skills/investment_research/SKILL.md` so they are editable as plain text
-- Register the skill in the Skill Registry with ID `investment_research`
-- Keep the skill broad at first: single stock analysis, comparisons, action recommendations, and capital deployment guidance
+- Put skill instructions in `skills/investment_research/SKILL.md`
+- Register skill ID `investment_research`
+- Keep the skill broad first: stock analysis, comparisons, action recommendations, and capital deployment guidance
 - Write the skill as a research playbook, not a generic prompt
-- The playbook should tell Hermes what evidence to gather and how to judge quality
-- Require a minimum research checklist: security resolution, business overview, recent financials, valuation context, recent developments, risks, source quality, and recommendation
+- Require checklist: security resolution, business overview, recent financials, valuation context, recent developments, risks, source quality, recommendation
 - Require portfolio fit analysis only when portfolio context is provided
-- Require the skill to state evidence gaps clearly instead of fabricating confidence
-- Define allowed recommendation labels such as `buy`, `watch`, `avoid`, and `need_more_info`
-- Define confidence labels such as `low`, `medium`, and `high`, tied to evidence quality
-- Define an output contract that includes chat brief, key reasons, key risks, recommendation, confidence, sources, and artifact payload
-- Keep disclaimers short and consistent
-- Do not let the output become legal boilerplate
-- Unit tests should validate skill registration, output contract expectations, unsupported request handling, and portfolio-context behavior through mocked executor/runtime outputs
+- Use recommendation labels: `buy`, `watch`, `avoid`, `need_more_info`
+- Use confidence labels: `low`, `medium`, `high`, tied to evidence quality
+- Output contract should include chat brief, key reasons, key risks, recommendation, confidence, sources, and artifact payload
+- Keep disclaimers short; avoid legal boilerplate
+- Unit tests should validate registration, output contract expectations, unsupported handling, and portfolio-context behavior through mocked executor/runtime outputs
+

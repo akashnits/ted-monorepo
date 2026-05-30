@@ -2,18 +2,11 @@
 
 ## Purpose
 
-The Context Service is the application boundary for user personalization data.
-
-It gives the Task Planner safe summaries for planning and gives the Request Orchestrator authorized context for execution. This lets the LLM discover useful personalization without letting it query database tables directly or bypass product policy.
+Owns the application boundary for user personalization data. It gives the planner safe summaries and gives the orchestrator authorized execution context.
 
 ```text
-Task Planner
--> Context Service
--> Planning-safe context summaries
-
-Request Orchestrator
--> Context Service
--> Authorized execution context
+Task Planner -> Context Service -> Safe summaries
+Request Orchestrator -> Context Service -> Authorized context
 ```
 
 ## Diagram
@@ -35,117 +28,76 @@ flowchart TD
 
 ## Flow
 
-The Context Service has two simple jobs.
+- Planning mode answers: what context exists that may help this request?
+- Execution mode answers: what context is authorized to pass into the agent?
 
-First, it helps the planner understand what context may be useful. For example, it can say that a profile exists, a portfolio exists, or shopping preferences exist. These are safe summaries used for planning.
+Examples: the planner can learn that profile, portfolio, shopping preferences, location, or currency exist. The orchestrator can receive profile fields automatically, but portfolio holdings only after user confirmation.
 
-Second, it gives the orchestrator the actual context that is allowed to go into execution. For example, profile fields can be included automatically, but portfolio holdings are only returned after the user confirms using portfolio context for that task.
+## Owns
 
-This keeps personalization useful while keeping sensitive context behind product rules.
+- Read-only context APIs for planning
+- Authorized context APIs for execution
+- Explicit profile retrieval
+- Portfolio availability and confirmation summaries
+- Full portfolio retrieval only after orchestrator authorization
+- Future personalization summaries for shopping, travel, reminders, and preferences
+- Hiding storage details from planner, orchestrator, executor, and skills
 
-## Responsibilities
+## Does Not Own
 
-- Expose read-only context APIs for planning
-- Expose authorized context APIs for execution
-- Retrieve explicit profile data
-- Report portfolio availability
-- Produce portfolio confirmation summaries
-- Retrieve full portfolio context only after orchestrator authorization
-- Provide future personalization summaries for domains such as shopping, travel, reminders, and preferences
-- Keep storage details hidden from planner, orchestrator, executor, and skills
-- Enforce explicit-memory rules at the context boundary
-
-## Non-Responsibilities
-
-- Task planning
-- Skill selection
+- Task planning or skill selection
 - Confirmation UX
-- Chat rendering
-- Agent execution
+- Chat rendering or agent execution
 - Investment reasoning
 - Durable memory inference
-- Updating profile or portfolio data from inferred behavior
+- Profile/portfolio updates from inferred behavior
 - Artifact persistence
 
 ## Interfaces
 
-The planner-facing APIs should return safe summaries:
+Planner-facing APIs return safe summaries:
 
 - `get_user_profile_summary`
 - `get_portfolio_availability`
 - `get_portfolio_confirmation_summary`
-- future domain summary APIs, such as shopping or travel preference summaries
+- future domain summaries
 
-The orchestrator-facing APIs may return execution context after policy checks:
+Orchestrator-facing APIs return authorized execution context:
 
 - explicit profile context
-- full portfolio context only after task-specific confirmation
-- future domain context only when allowed by the relevant product policy
+- full portfolio context after task-specific confirmation
+- future domain context when policy allows it
 
-The service should expose typed application objects or summaries, not raw database rows.
+Return typed application objects or summaries, not raw database rows.
 
-## Key Policies
+## Policies
 
-- The Task Planner may discover context through read-only summary APIs
-- The Task Planner must not receive full sensitive context unless that context is safe for planning
-- The Request Orchestrator authorizes which context can be passed to execution
-- Portfolio context requires task-specific user confirmation before execution use
-- Profile context may be used automatically because it is explicit durable context
-- The Context Service must not infer durable preferences from conversation
-- No planner, executor, skill, or chat adapter should query personalization tables directly
-- Future personalization domains should be added as explicit context APIs, not ad hoc database access
-
-## Access Modes
-
-Planning mode answers the question:
-
-```text
-What context exists that may help plan this request?
-```
-
-Examples:
-
-- profile is complete
-- portfolio exists
-- portfolio may be relevant
-- shopping preferences exist
-- location or currency is available
-
-Execution mode answers the question:
-
-```text
-What context is authorized to pass into the agent for this task?
-```
-
-Examples:
-
-- profile fields can be included automatically
-- portfolio holdings can be included only after confirmation
-- future sensitive context can be included only when the relevant policy allows it
+- Planner may discover context through read-only summary APIs
+- Planner must not receive full sensitive context unless safe for planning
+- Orchestrator authorizes what context can go to execution
+- Profile context is explicit durable context and may be used automatically
+- Portfolio context requires task-specific confirmation
+- Context Service must not infer durable preferences from chat
+- Future personalization domains should be added as explicit APIs, not ad hoc database access
 
 ## Acceptance Criteria
 
-- Planner can access safe context summaries through approved APIs
-- Planner cannot query database tables directly
-- Orchestrator can retrieve authorized execution context through the same service boundary
-- Profile context is available as explicit durable context
+- Planner can access safe summaries without direct table access
+- Orchestrator can retrieve authorized execution context through this boundary
 - Portfolio availability can be checked without exposing full holdings
-- Full portfolio context is unavailable for execution until user confirmation is recorded
-- Future personalization domains can be added without changing planner database access
-- Context Service does not write inferred preferences into durable memory
+- Full portfolio context is unavailable until confirmation is recorded
+- Future personalization domains can be added without changing planner DB access
 - Storage details remain hidden from planner, executor, skills, and chat adapters
 
 ## Implementation Notes
 
 - Put context code in `src/context/`
-- Use Postgres as the source of truth for profile, portfolio, and future explicit personalization data
-- Start with repository-style access behind the service
-- Do not allow direct database access from planner, orchestrator, executor, or skills
-- Expose two categories of methods: planning summaries and execution context
-- Planning summary methods should return safe compact objects like `ProfileSummary`, `PortfolioAvailability`, and `PortfolioConfirmationSummary`
-- Execution context methods can return fuller typed objects, but only when the orchestrator passes the required authorization or confirmation state
-- Use Pydantic models for context return types so planner inputs and executor context are structured and easy to validate
-- Keep context APIs read-only for now
-- Handle profile updates later as a separate explicit update flow
-- Do not add vector memory or semantic memory yet; keep personalization structured and explicit
-- Unit tests should verify that planner APIs never expose full sensitive context and execution APIs require authorization for portfolio data
+- Use Postgres as source of truth for profile, portfolio, and future explicit personalization data
+- Use repository-style access behind the service
+- Expose two method categories: planning summaries and execution context
+- Use Pydantic return models such as `ProfileSummary`, `PortfolioAvailability`, and `PortfolioConfirmationSummary`
+- Execution context methods can return fuller typed objects only with orchestrator authorization
+- Keep context APIs read-only for now; handle profile updates later as explicit flows
+- Do not add vector or semantic memory yet
+- Unit tests should verify planner APIs never expose full sensitive context and execution APIs require portfolio authorization
+

@@ -90,7 +90,7 @@ Output to the Agent Executor:
 - Define runtime request and result models with Pydantic
 - Keep Hermes auth, endpoint, model selection, and timeout config in the config layer
 - Use direct tool-calling research flow first
-- Do not enable sandbox execution or generated code execution for research
+- Use direct Research Tool Gateway calls only for research
 - Expose only Research Tool Gateway tools that are allowed for the selected skill
 - Convert app-level execution payloads into Hermes-specific payloads only inside this adapter
 - Normalize Hermes responses into app-level runtime results before returning to the executor
