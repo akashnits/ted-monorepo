@@ -71,3 +71,15 @@ flowchart TD
 - Validation and persistence failures are distinguishable
 - The app remains understandable without heavy observability infrastructure
 
+## Implementation Notes
+
+- Put logging/error helpers in `src/observability/` or `src/errors.py`
+- Use Python `logging` with structured fields where practical
+- Generate a request ID or run ID for each user request that reaches orchestration
+- Include component name, user ID, skill ID, run ID, and error category in logs when available
+- Keep user-facing errors generic and safe
+- Keep internal diagnostics in logs and structured result objects
+- Define typed application exceptions for expected failures such as planner, runtime, validation, persistence, and provider errors
+- Do not add heavy tracing or metrics infrastructure yet
+- Avoid logging secrets, raw provider credentials, full portfolio payloads, or unnecessary personal data
+- Unit tests should cover error classification, safe user messages, and log redaction helpers where applicable

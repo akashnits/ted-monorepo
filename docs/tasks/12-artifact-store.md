@@ -74,3 +74,15 @@ Output:
 - Invalid or failed outputs are not stored as completed artifacts
 - Artifact Store does not perform validation or research reasoning
 
+## Implementation Notes
+
+- Put artifact code in `src/artifacts/`
+- Store artifacts in Postgres first
+- Keep artifact payload as typed JSON so the structure can evolve without frequent migrations
+- Store source metadata in a separate table linked to the artifact
+- Save only validator-accepted completed outputs as completed artifacts
+- Include basic metadata: user ID, skill ID, task type, request text, created timestamp, recommendation, confidence, and source count
+- Return an artifact ID to the orchestrator after a successful save
+- Treat persistence failures as explicit failures; do not pretend the artifact was saved
+- Do not add retrieval UX yet, but store enough metadata for future lookup and refresh flows
+- Unit tests should cover saving artifacts, linking sources, rejecting invalid status, and persistence failure handling

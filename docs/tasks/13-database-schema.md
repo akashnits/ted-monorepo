@@ -71,3 +71,15 @@ erDiagram
 - Schema supports explicit-memory rules
 - Schema does not require complex retrieval, embeddings, or artifact versioning initially
 
+## Implementation Notes
+
+- Use Postgres as the primary database
+- Use SQLAlchemy 2.x models and Alembic migrations
+- Use async database access if the app runtime is async end-to-end
+- Start with tables for users, profiles, portfolios, sessions, research artifacts, and sources
+- Store flexible structured fields as JSONB where the shape may evolve, such as portfolio holdings, pending state, and artifact payloads
+- Enforce one profile and one portfolio per user with database constraints
+- Keep profile fields explicit and nullable instead of inventing defaults
+- Add timestamps to all durable tables
+- Do not add embeddings, vector search, artifact versioning, or complex portfolio modeling yet
+- Unit tests should cover constraints, basic repository operations, and migration creation once implementation starts

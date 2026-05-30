@@ -78,3 +78,16 @@ Output:
 - Invalid outputs are not saved as completed artifacts
 - Validator does not perform investment reasoning
 
+## Implementation Notes
+
+- Put validator code in `src/validation/`
+- Use Pydantic models for expected output contracts
+- Define one output schema for investment research first: brief, recommendation, confidence, key reasons, key risks, sources, artifact payload, and diagnostics
+- Keep recommendation labels constrained: `buy`, `watch`, `avoid`, and `need_more_info`
+- Keep confidence labels constrained: `low`, `medium`, and `high`
+- Validate required source metadata when the task requires evidence-backed output
+- Treat malformed or missing artifact payloads as validation failures, not partial successes
+- Do not rewrite the agent answer in the validator
+- The validator should accept or reject with structured reasons
+- The orchestrator decides whether to retry, ask for clarification, or return a failure message
+- Unit tests should cover valid output, missing fields, invalid labels, missing sources, malformed artifact payload, and unsupported status

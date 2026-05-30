@@ -73,3 +73,15 @@ flowchart TD
 - Telegram, database, Hermes, and research provider settings have clear config homes
 - Application modules do not read unrelated environment variables directly
 
+## Implementation Notes
+
+- Put config code in `src/config.py` or `src/config/`
+- Use Pydantic Settings for typed environment configuration
+- Keep `.env.example` in the repo with placeholder values only
+- Do not commit real `.env` files or secrets
+- Start with required settings for Telegram, Postgres, Hermes, and research providers
+- Keep model/runtime defaults in config, not hardcoded in adapter logic
+- Let local development read from environment variables or a local `.env`
+- Let deployment provide secrets through the hosting platform secret manager
+- Fail fast with clear errors when required settings are missing
+- Unit tests should cover config loading, missing required values, defaults, and secret redaction in string representations/logs
