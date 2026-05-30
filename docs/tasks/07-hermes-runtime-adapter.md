@@ -82,3 +82,20 @@ Output to the Agent Executor:
 - Adapter hides Hermes transport and payload details from the rest of the app
 - No orchestrator, planner, context service, or chat gateway calls Hermes directly
 
+## Implementation Notes
+
+- Put Hermes adapter code in `src/runtime/hermes/`
+- Keep a generic runtime interface in `src/runtime/types.py` or `src/runtime/base.py`
+- Use one public method like `run(request: RuntimeRequest) -> RuntimeResult`
+- Define runtime request and result models with Pydantic
+- Keep Hermes auth, endpoint, model selection, and timeout config in the config layer
+- Use direct tool-calling research flow first
+- Do not enable sandbox execution or generated code execution for research
+- Expose only Research Tool Gateway tools that are allowed for the selected skill
+- Convert app-level execution payloads into Hermes-specific payloads only inside this adapter
+- Normalize Hermes responses into app-level runtime results before returning to the executor
+- Treat malformed Hermes output as a structured runtime failure
+- Include diagnostics like runtime name, model, duration, and raw error category
+- Do not expose raw provider internals to users
+- Research quality should come from strong model selection, skill instructions, high-quality tools, and Output Validator checks
+- Unit tests should mock the Hermes client and cover request conversion, response normalization, timeout/error handling, and malformed output handling
